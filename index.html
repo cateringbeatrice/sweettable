@@ -1,0 +1,1892 @@
+<title>Générateur de table à desserts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#F8F5EE;
+    --surface:#FFFFFF;
+    --surface-2:#FBF8F2;
+    --ink:#2E2620;
+    --ink-soft:#6E5D50;
+    --line:#E4DAC9;
+    --accent:#7B3B4E;
+    --accent-soft:#F1E1E4;
+    --accent-line:#C98FA0;
+    --gold:#A07C33;
+    --gold-soft:#F3EAD1;
+    --vegan:#4E6E52;
+    --vegan-soft:#E5EDE2;
+    --util:#5B6B78;
+    --util-soft:#E7ECEF;
+    --greenery:#5C7A4F;
+    --shadow: 0 1px 2px rgba(46,38,32,.06), 0 6px 20px rgba(46,38,32,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#211B17; --surface:#2A2320; --surface-2:#251F1B;
+      --ink:#F2EBE2; --ink-soft:#C7B8AA; --line:#473C34;
+      --accent:#E3A9B6; --accent-soft:#3B2830; --accent-line:#8A5563;
+      --gold:#D9BA75; --gold-soft:#3A3120;
+      --vegan:#94B594; --vegan-soft:#293429;
+      --util:#9FB3C2; --util-soft:#26313A;
+      --greenery:#7FA06E;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#211B17; --surface:#2A2320; --surface-2:#251F1B;
+    --ink:#F2EBE2; --ink-soft:#C7B8AA; --line:#473C34;
+    --accent:#E3A9B6; --accent-soft:#3B2830; --accent-line:#8A5563;
+    --gold:#D9BA75; --gold-soft:#3A3120;
+    --vegan:#94B594; --vegan-soft:#293429;
+    --util:#9FB3C2; --util-soft:#26313A;
+    --greenery:#7FA06E;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 28px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Work Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1060px; margin:0 auto; padding:40px 22px 80px;}
+  h1,h2,h3{font-family:"Fraunces", Georgia, serif; font-weight:600; color:var(--ink); text-wrap:balance; margin:0;}
+  .eyebrow{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:8px;}
+  .logo{display:block; height:44px; width:auto; margin:0 auto 14px;}
+  .pw-card .logo{height:38px; margin:0 auto 16px;}
+  h1{font-size:clamp(26px,4vw,36px); letter-spacing:-.01em;}
+  p.byline{margin:6px 0 0; color:var(--ink-soft); font-size:13.5px; font-style:italic;}
+  p.note{margin:12px 0 0; color:var(--ink-soft); font-size:14.5px; max-width:68ch;}
+
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:22px 24px;}
+  .controls{margin-top:28px; display:grid; gap:22px;}
+  .card h2{font-size:15px; margin-bottom:2px;}
+  .card-sub{font-size:12.5px; color:var(--ink-soft); margin-bottom:14px;}
+
+  .field-row{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end;}
+  label{display:block; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); font-weight:600; margin-bottom:6px;}
+  input[type="number"], input[type="text"], select{
+    font-family:"Work Sans", sans-serif; font-size:14.5px; color:var(--ink);
+    background:var(--surface-2); border:1px solid var(--line); border-radius:8px;
+    padding:8px 10px; width:100px;
+  }
+  input[type="text"]{width:190px;}
+  .presets{display:flex; gap:8px; flex-wrap:wrap;}
+  .preset-btn{
+    font-family:"Work Sans", sans-serif; font-size:13px; color:var(--ink);
+    background:var(--surface-2); border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; cursor:pointer;
+  }
+  .preset-btn:hover{border-color:var(--accent-line);}
+
+  .vaisselle-grid{display:grid; gap:14px;}
+  .vtype-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:8px 0; border-bottom:1px solid var(--line);}
+  .vtype-row:last-child{border-bottom:none;}
+  .vtype-row input[type="checkbox"]{width:17px; height:17px; accent-color:var(--accent); flex:none;}
+  .vtype-row .v-label{font-size:14.5px; font-weight:600; min-width:200px;}
+  .vtype-row .v-label-input{
+    font-family:"Work Sans", sans-serif; font-size:14.5px; font-weight:600; color:var(--ink);
+    background:transparent; border:1px solid transparent; border-radius:6px;
+    padding:4px 6px; min-width:200px; width:260px; flex:1 1 260px; max-width:320px;
+  }
+  .vtype-row .v-label-input:hover{border-color:var(--line);}
+  .vtype-row .v-label-input:focus{outline:none; border-color:var(--accent-line); background:var(--surface-2);}
+  .vtype-row .v-sizes{display:flex; gap:8px; align-items:center; font-size:13px; color:var(--ink-soft);}
+  .vtype-row .v-sizes input{width:70px;}
+
+  .util-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 0; border-bottom:1px solid var(--line);}
+  .util-row:last-child{border-bottom:none;}
+  .util-row .u-label{font-size:14.5px; font-weight:600; min-width:200px;}
+
+  .dessert-list{display:grid; gap:8px; margin-top:10px;}
+  .dessert-item{display:flex; align-items:center; gap:10px; padding:6px 0; flex-wrap:wrap; border-bottom:1px solid var(--line);}
+  .dessert-item:last-child{border-bottom:none;}
+  .dessert-item input[type="checkbox"]{width:16px; height:16px; accent-color:var(--accent); flex:none;}
+  .dessert-item .d-name{font-size:14px; min-width:220px;}
+  .dessert-item .d-name-input{
+    font-family:"Work Sans", sans-serif; font-size:14px; color:var(--ink);
+    background:transparent; border:1px solid transparent; border-radius:6px;
+    padding:4px 6px; min-width:220px; width:280px; flex:1 1 280px; max-width:380px;
+  }
+  .dessert-item .d-name-input:hover{border-color:var(--line);}
+  .dessert-item .d-name-input:focus{outline:none; border-color:var(--accent-line); background:var(--surface-2);}
+  .dessert-item select{width:200px; font-size:13px;}
+  .dessert-item input[type="number"].qty{width:64px; padding:4px 6px; font-size:13px;}
+  .vegan-tag{font-size:9.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--vegan); background:var(--vegan-soft); border-radius:5px; padding:1px 5px; margin-left:4px;}
+
+  .add-custom{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line);}
+  .add-custom button, .generate-btn{
+    font-family:"Work Sans", sans-serif; font-weight:600; font-size:14px; color:#fff;
+    background:var(--accent); border:none; border-radius:9px; padding:9px 18px; cursor:pointer;
+  }
+  .add-custom button:hover, .generate-btn:hover{opacity:.92;}
+  .generate-btn{font-size:15px; padding:12px 26px; margin-top:6px;}
+  .warn{margin-top:8px;}
+  .warn:not(:empty){
+    display:block; background:var(--accent-soft); border:1px solid var(--accent-line); color:var(--accent);
+    border-radius:10px; padding:12px 14px; font-size:13.5px; font-weight:600; line-height:1.4;
+  }
+
+  .results{margin-top:36px; display:grid; gap:26px;}
+  .look-card{background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:22px 24px;}
+  .look-head{display:flex; align-items:baseline; gap:10px; margin-bottom:4px;}
+  .look-head h3{font-size:19px;}
+  .look-desc{font-size:13.5px; color:var(--ink-soft); margin:4px 0 16px;}
+
+  .table-area{
+    margin:0 auto; border-radius:6px; overflow:hidden;
+    display:flex; flex-direction:column; justify-content:space-between; padding:10px; position:relative;
+    background:var(--surface-2); border:1.5px solid var(--ink-soft);
+  }
+  .table-area.wood{background:#DAAB81; border-color:#A9754A;}
+  .table-area.blk{background:#1E1C1B; border-color:#000;}
+  .row{display:flex; flex-wrap:wrap; align-items:center; justify-content:center;}
+  .divider{border-top:1px dashed rgba(120,110,95,.4);}
+  .side-left{margin-right:auto; display:flex; align-items:center; gap:8px;}
+  .side-right{margin-left:auto; display:flex; align-items:center; gap:8px;}
+
+  /* Real vaisselle colors: every plate (round, square, rect) is genuinely
+     white porcelain. Cake stands are the one piece that comes in a choice
+     of finishes, so they get their own white/brown variants. The hero
+     piece (the centered showpiece) never changes color, since that would
+     no longer match the real dishware; it's marked with a subtle accent
+     ring instead so it still reads as the focal point. */
+  .shape{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    background:#FFFFFF; border:1.6px solid #DCD3C2; flex:none; overflow:hidden; padding:3px;
+    position:relative;
+  }
+  /* A cake stand (elevated) needs to read as clearly different from a flat
+     plate of the same diameter, even in a flat top-down schematic: a
+     stronger, wider drop shadow suggests it sits raised off the table, and
+     a thin inner ring shows the pedestal foot as it would actually be
+     visible peeking out from under the cake plate on top. */
+  .shape.stand{box-shadow:0 4px 9px rgba(46,38,32,.28);}
+  .shape.stand::after{
+    content:''; position:absolute; width:38%; height:38%; border-radius:50%;
+    border:1.5px solid rgba(46,38,32,.22); top:50%; left:50%; transform:translate(-50%,-50%);
+    pointer-events:none;
+  }
+  .shape.stand.stand-white{background:#FFFFFF; border-color:#DCD3C2;}
+  .shape.stand.stand-brown{background:#C9975E; border-color:#9C7040;}
+  .shape.stand.stand-brown::after{border-color:rgba(46,38,32,.32);}
+  .shape.hero{border-color:var(--accent); border-width:2.5px; box-shadow:0 0 0 3px var(--accent-soft);}
+  .shape.round{border-radius:50%;}
+  .shape.square, .shape.rect{border-radius:9px;}
+  .shape.vegan{background:var(--vegan-soft); border-color:var(--vegan); border-style:dashed;}
+  .shape.util{background:var(--util-soft); border-color:var(--util); border-style:dashed;}
+  /* Every piece becomes freely draggable right after a plan is generated,
+     so the person can fine-tune it by hand; grab/grabbing cursors and a
+     lift-off shadow give a clear physical "you can pick this up" cue, and
+     the piece currently being dragged always renders above the rest. */
+  .shape.draggable{cursor:grab; touch-action:none; user-select:none;}
+  .shape.draggable.dragging{cursor:grabbing; z-index:40; box-shadow:0 8px 18px rgba(46,38,32,.35); opacity:.94;}
+  .look-desc .drag-hint{color:var(--ink-soft); font-style:italic;}
+  .export-img-btn{
+    display:block; margin:14px auto 0; font-family:"Work Sans", sans-serif; font-size:13px; color:var(--ink);
+    background:var(--surface-2); border:1px solid var(--line); border-radius:999px;
+    padding:7px 16px; cursor:pointer;
+  }
+  .export-img-btn:hover{border-color:var(--accent-line);}
+  .export-img-btn:disabled{opacity:.6; cursor:default;}
+  .shape.greenery{background:radial-gradient(circle at 35% 30%, #8FAE7A, var(--greenery)); border-color:var(--greenery); border-radius:50%;}
+  /* Piece labels always sit on that piece's OWN light background (gold-soft,
+     accent-soft, vegan-soft, util-soft), never directly on the bare wood or
+     black table surface, so they always stay dark ink for contrast, no
+     matter what color the table itself is. */
+  .p-label{font-size:10.5px; font-weight:700; line-height:1.08; color:var(--ink);}
+  .p-dim{font-size:8.5px; color:var(--ink-soft); line-height:1.1; margin-top:2px;}
+  /* In-place rename: double-clicking a dessert's name on a generated plan
+     swaps the plain label for this input, sized and styled to match it so
+     nothing visibly jumps, right up until the piece's own edge. */
+  .p-label-edit{
+    font-family:"Work Sans", sans-serif; font-size:10.5px; font-weight:700; line-height:1.08; color:var(--ink);
+    width:100%; max-width:100%; text-align:center; background:var(--surface);
+    border:1px solid var(--accent-line); border-radius:4px; padding:1px 2px; box-sizing:border-box;
+  }
+  /* Right-click on any piece opens this tiny menu instead of the browser's
+     own context menu, with a single "remove this piece" action. */
+  .piece-menu{
+    position:fixed; z-index:200; background:var(--surface); border:1px solid var(--line);
+    border-radius:10px; box-shadow:0 8px 20px rgba(46,38,32,.28); padding:4px;
+    display:none; font-family:"Work Sans", sans-serif;
+  }
+  .piece-menu button{
+    display:block; width:100%; text-align:left; background:transparent; border:none; border-radius:6px;
+    padding:8px 14px; font-size:13px; color:var(--ink); cursor:pointer; white-space:nowrap;
+  }
+  .piece-menu button:hover{background:var(--accent-soft); color:var(--accent);}
+  /* Brief "undo" snackbar after removing a piece from a plan by hand. */
+  .undo-toast{
+    position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:210;
+    background:var(--ink); color:var(--surface); border-radius:999px; padding:10px 10px 10px 18px;
+    display:flex; align-items:center; gap:14px; font-family:"Work Sans", sans-serif; font-size:13.5px;
+    box-shadow:0 10px 24px rgba(0,0,0,.28);
+  }
+  .undo-toast button{
+    background:var(--accent); color:#fff; border:none; border-radius:999px; padding:7px 14px;
+    font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; font-family:"Work Sans", sans-serif;
+  }
+
+  /* This one DOES sit directly on the bare table surface (used only when a
+     band has nothing in it, e.g. "no elevated container chosen"), so it
+     needs to flip to a light color on the dark wood/black tables. */
+  .table-note{font-size:8.5px; color:var(--ink-soft);}
+  .table-area.wood .table-note{color:#5A3E28;}
+  .table-area.blk .table-note{color:#F0E9DC;}
+
+  /* dim-top/dim-side sit just outside the table box, on the card's own
+     white background, so they always stay dark too regardless of table
+     color. */
+  .dim-label{position:absolute; font-size:10.5px; color:var(--ink-soft); font-family:"Work Sans", sans-serif;}
+  .dim-top{top:-20px; left:50%; transform:translateX(-50%);}
+  .dim-side{left:-40px; top:50%; transform:translate(0,-50%) rotate(-90deg); transform-origin:center;}
+
+  .summary{margin-top:26px;}
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:var(--shadow);}
+  table{width:100%; border-collapse:collapse; font-size:14px;}
+  thead th{text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; padding:10px 14px; border-bottom:1px solid var(--line); background:var(--surface-2);}
+  tbody td{padding:9px 14px; border-bottom:1px solid var(--line);}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{font-variant-numeric:tabular-nums; font-weight:600; text-align:right;}
+
+  footer{margin-top:30px; font-size:12px; color:var(--ink-soft);}
+
+  .pw-gate{position:fixed; inset:0; z-index:9999; background:rgba(46,38,32,.6); display:flex; align-items:center; justify-content:center; padding:20px;}
+  .pw-gate.unlocked{display:none;}
+  .pw-card{background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:30px 26px; max-width:320px; width:100%; text-align:center; box-sizing:border-box;}
+  .pw-card h2{font-size:18px; margin:4px 0 6px;}
+  .pw-card p{font-size:13px; color:var(--ink-soft); margin:0 0 18px;}
+  .pw-card input[type="password"]{width:100%; font-size:15px; padding:10px 12px; margin-bottom:10px; box-sizing:border-box;}
+  .pw-card button{width:100%; font-family:"Work Sans", sans-serif; font-weight:600; font-size:14px; color:#fff; background:var(--accent); border:none; border-radius:9px; padding:10px 18px; cursor:pointer;}
+  .pw-error{color:var(--accent); font-size:12.5px; margin-top:10px; min-height:16px;}
+  .wrap.locked{display:none;}
+</style>
+
+<div class="pw-gate" id="pwGate">
+  <div class="pw-card">
+    <img class="logo" src="data:image/png;base64,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" alt="Traiteur Béatrice">
+    <div class="eyebrow">Générateur de table à desserts</div>
+    <h2>Accès protégé</h2>
+    <p>Entre le mot de passe pour continuer.</p>
+    <form id="pwForm">
+      <input type="password" id="pwInput" placeholder="Mot de passe" autocomplete="current-password">
+      <button type="submit">Entrer</button>
+      <div class="pw-error" id="pwError"></div>
+    </form>
+  </div>
+</div>
+
+<div class="wrap locked" id="mainWrap">
+
+  <header>
+    <img class="logo" src="data:image/png;base64,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" alt="Traiteur Béatrice">
+    <div class="eyebrow">Générateur de table à desserts</div>
+    <h1>Compose ta table à desserts</h1>
+    <p class="byline">Par Adam Dirhoussi</p>
+    <p class="note">
+      1) Taille et couleur de table.<br>
+      2) Les types de vaisselle en jeu.<br>
+      3) Tes desserts, chacun assigné au contenant de ton choix.<br>
+      Les 3 dispositions restent toujours à l'échelle réelle et à l'intérieur des limites de la table, avec un résultat équilibré et symétrique. Rien n&rsquo;est sauvegardé d&rsquo;une visite à l&rsquo;autre.
+    </p>
+  </header>
+
+  <div class="controls">
+    <div class="card">
+      <h2>1. Table</h2>
+      <div class="presets" id="presets" style="margin-top:10px;"></div>
+      <div class="field-row" style="margin-top:12px;">
+        <div><label>Largeur (po)</label><input type="number" id="tableW" value="96" min="24" max="360"></div>
+        <div><label>Profondeur (po)</label><input type="number" id="tableD" value="36" min="18" max="60"></div>
+        <div><label>Couleur</label>
+          <select id="tableColor">
+            <option value="default">Ivoire</option>
+            <option value="wood">Bois brun</option>
+            <option value="blk">Noir</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2. Vaisselle disponible</h2>
+      <div class="card-sub">Coche les types que tu veux avoir en jeu, ajuste les tailles. Tes desserts choisiront parmi ceux-ci.</div>
+      <div class="vaisselle-grid" id="vaisselleGrid"></div>
+
+      <div class="util-row">
+        <input type="checkbox" id="plateOn">
+        <span class="u-label">Assiettes invités</span>
+        <select id="plateSize"><option value="6">6"</option><option value="8">8"</option></select>
+        <label style="margin:0 6px 0 12px; text-transform:none; font-weight:400; color:var(--ink-soft);">côté</label>
+        <select id="platePos"><option value="left">gauche</option><option value="right">droite</option></select>
+      </div>
+      <div class="util-row">
+        <input type="checkbox" id="forkOn">
+        <span class="u-label">Fourchettes (plateau rectangulaire)</span>
+        <label style="margin:0 6px 0 0; text-transform:none; font-weight:400; color:var(--ink-soft);">côté</label>
+        <select id="forkPos"><option value="left">gauche</option><option value="right">droite</option></select>
+      </div>
+      <div class="util-row">
+        <label style="margin:0 8px 0 0;">Plantes déco</label>
+        <input type="number" id="plantCount" value="2" min="0" max="8" style="width:64px;">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3. Desserts</h2>
+      <div class="card-sub">Coche, choisis le contenant (parmi la vaisselle activée). La quantité est optionnelle: mets 2 si ce dessert doit occuper 2 assiettes/présentoirs sur la table (comme s'il était ajouté deux fois).</div>
+      <div class="dessert-list" id="dessertList"></div>
+      <div class="add-custom">
+        <div><label>Nom du dessert</label><input type="text" id="cName" placeholder="ex. Macarons pistache"></div>
+        <div style="display:flex; align-items:center; gap:6px; padding-bottom:9px;">
+          <input type="checkbox" id="cVegan" style="width:16px;height:16px;accent-color:var(--vegan);">
+          <label style="margin:0;">Végane / allergène (isolé)</label>
+        </div>
+        <button onclick="addCustomDessert()">Ajouter à la liste</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>4. Enregistrer / charger une table</h2>
+      <div class="card-sub" id="saveLoadHint">Donne un nom (ex. un événement) pour retrouver cette table plus tard.</div>
+      <div class="field-row">
+        <div style="flex:1; min-width:220px;"><label>Nom</label><input type="text" id="saveName" placeholder="ex. Mariage Tremblay - 26 sept 2026" style="width:100%;"></div>
+        <button type="button" id="saveBtn" onclick="handleSaveTable(this)">Enregistrer cette table</button>
+      </div>
+      <div id="saveStatus" class="note" style="margin-top:6px; min-height:1em;"></div>
+      <div id="savedList" style="margin-top:12px;"></div>
+    </div>
+
+    <button class="generate-btn" onclick="generate()">Générer les 3 dispositions</button>
+    <div class="warn" id="warn"></div>
+  </div>
+
+  <div class="results" id="results"></div>
+  <div class="summary" id="summary"></div>
+
+  <footer>Assiettes invités et fourchettes sont toujours placées tout en bas, à l'extrémité du côté choisi. Elles ne comptent pas comme desserts. Chaque disposition est toujours à l'échelle réelle: si trop d'items sont choisis pour la table, l'espace entre les pièces est d'abord réduit, puis les pièces se répartissent sur plusieurs rangées au besoin. Rien n'est jamais rapetissé sous sa vraie taille.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  // Simple client-side password gate. Not real security (anyone who reads
+  // the page source can find the password), just a light "not just anyone
+  // stumbling in" barrier, per request. Remembers the unlock for the rest
+  // of the browser session so a refresh doesn't ask again.
+  (function(){
+    const PW = 'AdamBeatrice';
+    const gate = document.getElementById('pwGate');
+    const wrap = document.getElementById('mainWrap');
+    const form = document.getElementById('pwForm');
+    const input = document.getElementById('pwInput');
+    const err = document.getElementById('pwError');
+
+    function unlock(){
+      gate.classList.add('unlocked');
+      wrap.classList.remove('locked');
+      try{ sessionStorage.setItem('desserts_unlocked', '1'); }catch(e){}
+    }
+
+    let already = false;
+    try{ already = sessionStorage.getItem('desserts_unlocked') === '1'; }catch(e){}
+    if(already){ unlock(); }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      if(input.value === PW){
+        err.textContent = '';
+        unlock();
+      } else {
+        err.textContent = 'Mot de passe incorrect.';
+        input.value = '';
+        input.focus();
+      }
+    });
+  })();
+
+  const VAISSELLE_TYPES = [
+    {key:'standWhite', label:'Cake stand blanc (ronde, élevée)', shapeKind:'round', elevated:true, defaultSize:12, on:true, color:'white'},
+    {key:'standBrown', label:'Cake stand brun (ronde, élevée)', shapeKind:'round', elevated:true, defaultSize:12, on:false, color:'brown'},
+    {key:'roundPlate', label:'Assiette ronde (à plat)', shapeKind:'round', elevated:false, defaultSize:12, on:true},
+    {key:'squarePlate', label:'Assiette carrée', shapeKind:'square', elevated:false, defaultSize:10.25, on:false},
+    {key:'rectPlatter', label:'Plateau rectangulaire', shapeKind:'rect', elevated:false, defaultSize:14, defaultSize2:9, on:false},
+  ];
+
+  // default container is just a starting suggestion, fully editable per dessert
+  const DESSERT_NAMES = [
+    {name:"Fruits frais de saison, garnis de petits fruits", def:'roundPlate'},
+    {name:"Petits fruits en pot Mason", def:'roundPlate'},
+    {name:"Biscottis aux amandes et au chocolat", def:'roundPlate'},
+    {name:"Fraises enrobées de chocolat", def:'standWhite'},
+    {name:"Sucettes Cheesecake/Chocolat", def:'standWhite'},
+    {name:"Crème brûlée", def:'roundPlate'},
+    {name:"Cannoli", def:'standWhite'},
+    {name:"Mini-tartelettes", def:'standWhite'},
+    {name:"Shooters", def:'roundPlate'},
+    {name:"Carrés : brownies, blondies", def:'rectPlatter'},
+    {name:"Truffes", def:'standWhite'},
+    {name:"Écorces de chocolat", def:'roundPlate'},
+    {name:"Beignets au Nutella", def:'roundPlate'},
+    {name:"Popcorn au caramel", def:'roundPlate'},
+    {name:"Cookies", def:'roundPlate'},
+    {name:"Crinkle Cookies : citron, chocolat", def:'squarePlate'},
+    {name:"Budino", def:'roundPlate'},
+    {name:"Soufflé au chocolat", def:'roundPlate'},
+    {name:"Mini cupcakes", def:'standWhite'},
+    {name:"Paris-Brest", def:'standWhite'},
+    {name:"Éclairs", def:'rectPlatter'},
+  ].map(d => ({...d, vegan:false}));
+
+  const PRESETS = [
+    {label:"6' × 30\"", w:72, d:30, color:'default'},
+    {label:"8' × 36\"", w:96, d:36, color:'default'},
+    {label:"Table marron Amea 75×39\"", w:75, d:39, color:'wood'},
+    {label:"Table haute noire Amea 75×33.5\"", w:75, d:33.5, color:'blk'},
+  ];
+
+  const GAP_MAX = 14;      // default/fallback gap when a row has just 1 piece (gap between multiple pieces is otherwise free to grow and fill the row)
+  const GAP_MIN = 4;       // min gap before pieces have to wrap to a new row
+  const BAND_GAP = 24;     // vertical space between back/front bands (or a band and the vegan station)
+  const ROW_GAP = 8;       // vertical space between wrapped rows inside one band
+  const PLANT_SIZE_IN = 3.5;
+
+  function renderPresets(){
+    const box = document.getElementById('presets');
+    box.innerHTML = PRESETS.map((p,i)=>
+      `<button type="button" class="preset-btn" onclick="applyPreset(${i})">${p.label}</button>`
+    ).join('');
+  }
+  function applyPreset(i){
+    document.getElementById('tableW').value = PRESETS[i].w;
+    document.getElementById('tableD').value = PRESETS[i].d;
+    document.getElementById('tableColor').value = PRESETS[i].color;
+  }
+
+  function enabledTypes(){
+    return VAISSELLE_TYPES.filter(t => document.getElementById('v_on_'+t.key) ? document.getElementById('v_on_'+t.key).checked : t.on);
+  }
+
+  // Renaming a vaisselle type (e.g. "Cake stand blanc" -> whatever she
+  // actually calls it) updates VAISSELLE_TYPES directly, so it's reflected
+  // immediately everywhere that label shows up: the checkbox row itself,
+  // and every dessert's container dropdown (which lists these same
+  // labels), refreshed right after.
+  function renameVaisselle(key, value){
+    const t = VAISSELLE_TYPES.find(tt=>tt.key===key);
+    if(t) t.label = value;
+    renderDessertList(true);
+  }
+
+  function renderVaisselleGrid(){
+    const box = document.getElementById('vaisselleGrid');
+    box.innerHTML = VAISSELLE_TYPES.map(t => {
+      const sizeInputs = t.shapeKind==='rect'
+        ? `<input type="number" id="v_w_${t.key}" value="${t.defaultSize}" step="0.25" style="width:64px;"> ×
+           <input type="number" id="v_d_${t.key}" value="${t.defaultSize2}" step="0.25" style="width:64px;"> po`
+        : `<input type="number" id="v_s_${t.key}" value="${t.defaultSize}" step="0.25"> po ${t.shapeKind==='round'?'D':'côté'}`;
+      return `<div class="vtype-row">
+        <input type="checkbox" id="v_on_${t.key}" ${t.on?'checked':''} onchange="onVaisselleChange()">
+        <input type="text" class="v-label-input" id="vlabel_${t.key}" value="${escapeAttr(t.label)}" oninput="renameVaisselle('${t.key}', this.value)">
+        <span class="v-sizes">${sizeInputs}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function onVaisselleChange(){
+    renderDessertList(true);
+  }
+
+  function containerOptionsHTML(selectedKey){
+    const en = enabledTypes();
+    if(en.length===0) return '<option value="">(active une vaisselle)</option>';
+    return en.map(t => `<option value="${t.key}" ${t.key===selectedKey?'selected':''}>${t.label}</option>`).join('');
+  }
+
+  // Per-dessert container choice, remembered across re-renders. Any value
+  // already sitting in chosenContainer (whether picked by hand or assigned
+  // automatically before) is kept as-is as long as its type is still
+  // enabled, so clicking Générer again never reshuffles a choice that's
+  // still valid. A dessert only gets a fresh pick when it has none yet: its
+  // suggested default container on the very first page load, or a random
+  // pick among the currently enabled vaisselle types afterward, so turning
+  // a vaisselle type on gives some visual variety to start from instead of
+  // funneling every dessert into the same default. The person can always
+  // override any dropdown by hand afterward, and that choice then sticks.
+  const chosenContainer = {};
+
+  // Tracks which arrangement each look has already shown this visit, so
+  // clicking "Générer" again on the same selection surfaces a genuinely
+  // different plan instead of the exact same 3 every time, cycling through
+  // fresh ones until the possibilities for this exact selection really do
+  // run out, at which point it's fine to show one that's already been
+  // seen. Resets whenever the selection itself changes (new/removed items,
+  // different table, different plant count, etc.), since nothing here is
+  // saved between visits either.
+  let seenLookSignatures = {};
+  let lastSelectionKey = null;
+  function selectionKey(widthIn, depthIn, items, plantCount){
+    return JSON.stringify({
+      w: Math.round(widthIn*100), d: Math.round(depthIn*100), p: plantCount,
+      items: items.map(i => [i.name, i.qty||0, i.shapeKind, i.elevated?1:0, i.wIn, i.dIn, i.color||'', i.vegan?1:0]).sort()
+    });
+  }
+
+  function escapeAttr(s){
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Every dessert's name (the ones already in the list, not just new ones
+  // added at the bottom) is a real text field, editable right where it
+  // sits: rename "Cannoli" to "Cannoli pistache" or fix a typo directly,
+  // with no need to remove it and re-add it through the custom-dessert
+  // form. The change updates DESSERT_NAMES immediately, so it's reflected
+  // the next time a plan is generated (and in the summary table).
+  function renameDessert(i, value){
+    DESSERT_NAMES[i].name = value;
+  }
+
+  // Same rename, but triggered by double-clicking a dessert's name directly
+  // on a generated plan. Keeps every place that dessert's name shows up in
+  // sync: the field in section 3, every OTHER piece for the same dessert
+  // (across all 3 dispositions, and any repeats from a quantité of 2+), and
+  // the summary table at the bottom, none of which re-read DESSERT_NAMES on
+  // their own since the plans are already frozen in place by the time this
+  // can happen.
+  function renameDessertFromPlan(i, value){
+    const clean = String(value).trim();
+    if(!DESSERT_NAMES[i] || !clean) return;
+    DESSERT_NAMES[i].name = clean;
+    const formInput = document.getElementById('dname'+i);
+    if(formInput) formInput.value = clean;
+    document.querySelectorAll('.shape[data-dessert-idx="'+i+'"] .p-label').forEach(el=>{ el.textContent = clean; });
+    document.querySelectorAll('#summary tr[data-dessert-idx="'+i+'"] td:first-child').forEach(td=>{ td.textContent = clean; });
+  }
+
+  function renderDessertList(keepChecks){
+    const box = document.getElementById('dessertList');
+    const en = enabledTypes();
+    const enKeys = en.map(t=>t.key);
+    box.innerHTML = DESSERT_NAMES.map((d,i)=>{
+      const wasChecked = keepChecks && document.getElementById('chk'+i) ? document.getElementById('chk'+i).checked : (i<6);
+      const prevQty = keepChecks && document.getElementById('qty'+i) ? document.getElementById('qty'+i).value : '';
+      let sel = chosenContainer[i];
+      if(!sel || !enKeys.includes(sel)){
+        if(!keepChecks){
+          sel = enKeys.includes(d.def) ? d.def : (enKeys.length ? enKeys[0] : '');
+        } else {
+          sel = enKeys.length ? enKeys[Math.floor(Math.random()*enKeys.length)] : '';
+        }
+      }
+      chosenContainer[i] = sel;
+      return `<div class="dessert-item">
+        <input type="checkbox" id="chk${i}" ${wasChecked?'checked':''}>
+        <input type="text" class="d-name-input" id="dname${i}" value="${escapeAttr(d.name)}" oninput="renameDessert(${i}, this.value)">
+        ${d.vegan?'<span class="vegan-tag">végane</span>':''}
+        <select id="cont${i}" onchange="chosenContainer[${i}]=this.value;">${containerOptionsHTML(sel)}</select>
+        <input type="number" class="qty" id="qty${i}" placeholder="qté" min="0" value="${prevQty}">
+      </div>`;
+    }).join('');
+  }
+
+  function addCustomDessert(){
+    const name = document.getElementById('cName').value.trim();
+    if(!name) return;
+    const vegan = document.getElementById('cVegan').checked;
+    DESSERT_NAMES.push({name, vegan, def:'roundPlate'});
+    renderDessertList(true);
+    document.getElementById('cName').value = '';
+  }
+
+  // ===== Save / load a whole table by name (e.g. one event) =====
+  //
+  // When this page is open through its real claude.ai link (not the
+  // downloaded standalone file), a "db" runtime capability is available:
+  // a small shared, persistent store tied to this artifact. That's used
+  // here so a saved table survives across visits and devices, exactly
+  // like "recover it whenever" needs. If that capability isn't available
+  // (the file was downloaded and opened directly, or the capability
+  // simply isn't granted in this view), saving still works, but falls
+  // back to this one browser's own storage only, which is clearly
+  // labeled as such below so nothing is silently less durable than it
+  // looks.
+  let dbNS = null;
+  let downloadsNS = null;
+  const LOCAL_SAVE_KEY = 'sweetTableSaves';
+
+  async function initCapabilities(){
+    if(window.claude && typeof window.claude.use === 'function'){
+      try{ dbNS = await window.claude.use('db'); }catch(e){ dbNS = null; }
+      try{ downloadsNS = await window.claude.use('downloads'); }catch(e){ downloadsNS = null; }
+    }
+    const hint = document.getElementById('saveLoadHint');
+    if(hint){
+      hint.textContent = dbNS
+        ? "Donne un nom (ex. un événement) pour retrouver cette table plus tard, sur n'importe quel appareil, tant que tu es connectée à ce lien Claude."
+        : "Donne un nom (ex. un événement) pour retrouver cette table plus tard. Enregistré seulement dans ce navigateur-ci (le lien Claude n'est pas connecté ici).";
+    }
+    renderSavedList();
+  }
+
+  function serializeConfig(){
+    return {
+      tableW: document.getElementById('tableW').value,
+      tableD: document.getElementById('tableD').value,
+      tableColor: document.getElementById('tableColor').value,
+      vaisselle: VAISSELLE_TYPES.map(t=>{
+        const base = {key:t.key, label:t.label, on: document.getElementById('v_on_'+t.key).checked};
+        if(t.shapeKind==='rect'){
+          base.w = document.getElementById('v_w_'+t.key).value;
+          base.d = document.getElementById('v_d_'+t.key).value;
+        } else {
+          base.s = document.getElementById('v_s_'+t.key).value;
+        }
+        return base;
+      }),
+      dessertNames: DESSERT_NAMES.map(d=>({name:d.name, vegan:!!d.vegan, def:d.def})),
+      selections: DESSERT_NAMES.map((d,i)=>({
+        checked: document.getElementById('chk'+i) ? document.getElementById('chk'+i).checked : false,
+        qty: document.getElementById('qty'+i) ? document.getElementById('qty'+i).value : '',
+        container: document.getElementById('cont'+i) ? document.getElementById('cont'+i).value : '',
+      })),
+      plantCount: document.getElementById('plantCount').value,
+      plateOn: document.getElementById('plateOn').checked,
+      plateSize: document.getElementById('plateSize').value,
+      platePos: document.getElementById('platePos').value,
+      forkOn: document.getElementById('forkOn').checked,
+      forkPos: document.getElementById('forkPos').value,
+    };
+  }
+
+  function applyConfig(cfg){
+    if(!cfg) return;
+    document.getElementById('tableW').value = cfg.tableW;
+    document.getElementById('tableD').value = cfg.tableD;
+    document.getElementById('tableColor').value = cfg.tableColor;
+
+    (cfg.vaisselle||[]).forEach(v=>{
+      const t = VAISSELLE_TYPES.find(tt=>tt.key===v.key);
+      if(t && v.label) t.label = v.label;
+    });
+    renderVaisselleGrid();
+    (cfg.vaisselle||[]).forEach(v=>{
+      const t = VAISSELLE_TYPES.find(tt=>tt.key===v.key);
+      if(!t) return;
+      const onEl = document.getElementById('v_on_'+v.key);
+      if(onEl) onEl.checked = !!v.on;
+      if(t.shapeKind==='rect'){
+        const wEl = document.getElementById('v_w_'+v.key), dEl = document.getElementById('v_d_'+v.key);
+        if(wEl && v.w!=null) wEl.value = v.w;
+        if(dEl && v.d!=null) dEl.value = v.d;
+      } else {
+        const sEl = document.getElementById('v_s_'+v.key);
+        if(sEl && v.s!=null) sEl.value = v.s;
+      }
+    });
+
+    // Replace the dessert list wholesale (not merge) so a saved table's
+    // custom additions and renames come back exactly as they were, in the
+    // same order, which is what the per-index selections below rely on.
+    DESSERT_NAMES.length = 0;
+    (cfg.dessertNames||[]).forEach(d=>DESSERT_NAMES.push({...d}));
+    renderDessertList(false);
+    (cfg.selections||[]).forEach((sel,i)=>{
+      const chk = document.getElementById('chk'+i);
+      const qty = document.getElementById('qty'+i);
+      const cont = document.getElementById('cont'+i);
+      if(chk) chk.checked = !!sel.checked;
+      if(qty) qty.value = sel.qty || '';
+      if(cont && sel.container){ cont.value = sel.container; chosenContainer[i] = sel.container; }
+    });
+
+    document.getElementById('plantCount').value = cfg.plantCount;
+    document.getElementById('plateOn').checked = !!cfg.plateOn;
+    document.getElementById('plateSize').value = cfg.plateSize;
+    document.getElementById('platePos').value = cfg.platePos;
+    document.getElementById('forkOn').checked = !!cfg.forkOn;
+    document.getElementById('forkPos').value = cfg.forkPos;
+  }
+
+  async function listSavedTables(){
+    if(dbNS){
+      const snap = await dbNS.collection('sweetTables').orderBy('savedAt', 'desc').limit(50).get();
+      return snap.docs.map(d => ({id: d.id, ...d.data()}));
+    }
+    try{
+      const raw = localStorage.getItem(LOCAL_SAVE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return arr.slice().sort((a,b) => (b.savedAt||'').localeCompare(a.savedAt||''));
+    }catch(e){ return []; }
+  }
+
+  async function saveCurrentTable(eventName){
+    const config = serializeConfig();
+    const savedAt = new Date().toISOString();
+    if(dbNS){
+      await dbNS.collection('sweetTables').add({eventName, savedAt, config});
+      return;
+    }
+    const raw = localStorage.getItem(LOCAL_SAVE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    arr.push({id: 'local-'+Date.now(), eventName, savedAt, config});
+    localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(arr));
+  }
+
+  async function deleteSavedTable(id){
+    if(dbNS){
+      await dbNS.collection('sweetTables').doc(id).delete();
+      return;
+    }
+    const raw = localStorage.getItem(LOCAL_SAVE_KEY);
+    let arr = raw ? JSON.parse(raw) : [];
+    arr = arr.filter(x => x.id !== id);
+    localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(arr));
+  }
+
+  async function renderSavedList(){
+    const box = document.getElementById('savedList');
+    if(!box) return;
+    let items = [];
+    try{
+      items = await listSavedTables();
+    }catch(e){
+      box.innerHTML = '<p class="note" style="margin-top:0;">Impossible de lister les tables enregistrées pour le moment.</p>';
+      return;
+    }
+    if(items.length===0){
+      box.innerHTML = '<p class="note" style="margin-top:0;">Aucune table enregistrée pour l\'instant.</p>';
+      return;
+    }
+    box.innerHTML = '';
+    items.forEach(it => {
+      const row = document.createElement('div');
+      row.className = 'util-row';
+      const when = it.savedAt ? new Date(it.savedAt).toLocaleDateString('fr-CA', {year:'numeric', month:'short', day:'numeric'}) : '';
+      const label = document.createElement('span');
+      label.className = 'u-label';
+      label.style.cssText = 'min-width:0; flex:1;';
+      label.textContent = (it.eventName || '(sans nom)') + (when ? '  ·  '+when : '');
+      const loadBtn = document.createElement('button');
+      loadBtn.type = 'button';
+      loadBtn.textContent = 'Charger';
+      loadBtn.className = 'preset-btn';
+      loadBtn.onclick = () => handleLoadTable(it.config);
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.textContent = 'Supprimer';
+      delBtn.className = 'preset-btn';
+      delBtn.style.color = 'var(--accent)';
+      delBtn.style.marginLeft = '8px';
+      delBtn.onclick = () => handleDeleteTable(it.id);
+      row.appendChild(label);
+      row.appendChild(loadBtn);
+      row.appendChild(delBtn);
+      box.appendChild(row);
+    });
+  }
+
+  async function handleSaveTable(btn){
+    const nameEl = document.getElementById('saveName');
+    const name = nameEl.value.trim();
+    const status = document.getElementById('saveStatus');
+    if(!name){ nameEl.focus(); return; }
+    const original = btn.textContent;
+    btn.textContent = 'Enregistrement...'; btn.disabled = true;
+    try{
+      await saveCurrentTable(name);
+      nameEl.value = '';
+      if(status) status.textContent = `« ${name} » enregistrée.`;
+      await renderSavedList();
+    }catch(e){
+      if(status) status.textContent = "L'enregistrement a échoué, réessaie dans un instant.";
+    }finally{
+      btn.textContent = original; btn.disabled = false;
+    }
+  }
+
+  function handleLoadTable(cfg){
+    applyConfig(cfg);
+    generate();
+    const status = document.getElementById('saveStatus');
+    if(status) status.textContent = 'Table chargée.';
+  }
+
+  async function handleDeleteTable(id){
+    try{
+      await deleteSavedTable(id);
+      renderSavedList();
+    }catch(e){
+      const status = document.getElementById('saveStatus');
+      if(status) status.textContent = 'La suppression a échoué.';
+    }
+  }
+
+  // ===== Export a plan as an image =====
+  //
+  // A published Claude artifact runs inside a sandbox that quietly
+  // ignores a plain "click here to download" link, so wherever the
+  // "downloads" runtime capability is available, that's what actually
+  // hands the image to the person. On the standalone downloaded file
+  // (opened directly, outside claude.ai), there's no such sandbox, so a
+  // normal in-page download link works there instead.
+  async function saveImageBlob(filename, blob){
+    if(downloadsNS){
+      await downloadsNS.save({filename, data: blob});
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  function slugForFilename(s){
+    return s.normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  }
+
+  function exportLookImage(btn){
+    const card = btn.closest('.look-card');
+    const area = card ? card.querySelector('.table-area') : null;
+    const lookName = card ? card.getAttribute('data-look') : 'plan';
+    const original = btn.textContent;
+    if(!area || typeof html2canvas !== 'function'){
+      btn.textContent = 'Image indisponible';
+      setTimeout(() => { btn.textContent = original; }, 2200);
+      return;
+    }
+    btn.textContent = 'Préparation...'; btn.disabled = true;
+    html2canvas(area, {backgroundColor: null, scale: 2}).then(canvas => {
+      canvas.toBlob(blob => {
+        if(!blob){
+          btn.textContent = 'Échec'; setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000);
+          return;
+        }
+        const filename = `plan-${slugForFilename(lookName)}.png`;
+        saveImageBlob(filename, blob).then(() => {
+          btn.textContent = original; btn.disabled = false;
+        }).catch(() => {
+          btn.textContent = 'Échec du téléchargement';
+          setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
+        });
+      }, 'image/png');
+    }).catch(() => {
+      btn.textContent = 'Échec'; setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
+    });
+  }
+
+  function getTypeSpec(key){
+    const t = VAISSELLE_TYPES.find(t=>t.key===key);
+    if(!t) return null;
+    const color = t.color || null;
+    if(t.shapeKind==='rect'){
+      const w = parseFloat(document.getElementById('v_w_'+key).value) || t.defaultSize;
+      const d = parseFloat(document.getElementById('v_d_'+key).value) || t.defaultSize2;
+      return {shapeKind:'rect', elevated:t.elevated, wIn:w, dIn:d, label:t.label, color};
+    }
+    const s = parseFloat(document.getElementById('v_s_'+key).value) || t.defaultSize;
+    return {shapeKind:t.shapeKind, elevated:t.elevated, wIn:s, dIn:s, label:t.label, color};
+  }
+
+  function getSelected(){
+    return DESSERT_NAMES.map((d,i)=>{
+      const chk = document.getElementById('chk'+i);
+      if(!chk || !chk.checked) return null;
+      const contKey = document.getElementById('cont'+i).value;
+      const spec = getTypeSpec(contKey);
+      if(!spec) return null;
+      const qtyEl = document.getElementById('qty'+i);
+      const qty = qtyEl && qtyEl.value ? parseInt(qtyEl.value) : null;
+      // dessertIndex ties every piece built from this item back to its row
+      // in DESSERT_NAMES, so a rename made directly on a generated plan can
+      // find and update every other place that same dessert shows up.
+      return {name:d.name, vegan:d.vegan, qty, dessertIndex:i, ...spec};
+    }).filter(Boolean);
+  }
+
+  // A quantité of 2 or more on a dessert means it needs that many separate
+  // plates/stands on the table, exactly as if it had been added as its own
+  // repeated dessert: this expands each such item into that many individual
+  // pieces before layout, so the symmetry/centering logic (which works
+  // piece by piece) naturally places them as a matching set, mirrored like
+  // any other repeated container. The summary table (built from the
+  // un-expanded selection) still shows one row per dessert with its real
+  // quantité, so prep counts stay correct. A single piece never shows a
+  // "qty" label on itself anymore, since the number now means "how many
+  // plates", not "how many pieces on this plate".
+  function expandForPlacement(items){
+    const out = [];
+    items.forEach(it=>{
+      const n = it.qty && it.qty>=1 ? Math.round(it.qty) : 1;
+      for(let k=0; k<Math.max(1,n); k++){
+        out.push({...it, qty:null});
+      }
+    });
+    return out;
+  }
+
+  function scaleFor(widthIn){
+    return Math.max(3, Math.min(10, 860/widthIn));
+  }
+
+  // The identity of a "container kind": shape + true size + elevated or
+  // not + finish color, since that's what "the same piece repeated" means
+  // for symmetry purposes. A cake stand and a flat plate of the same
+  // diameter still read as two different container types on the table.
+  function containerKey(it){
+    return it.shapeKind+':'+(it.elevated?1:0)+':'+(it.color||'')+':'+it.wIn+'x'+it.dIn;
+  }
+
+  // Groups items by container kind, using the shared containerKey identity.
+  function groupByKey(items){
+    const map = new Map();
+    items.forEach(it=>{
+      const key = containerKey(it);
+      if(!map.has(key)) map.set(key, []);
+      map.get(key).push(it);
+    });
+    return Array.from(map.values());
+  }
+
+  // Container kinds that appear exactly once across the WHOLE selection
+  // (not just within one back/front band). A band-splitting algorithm can
+  // isolate some other, actually-common container kind down to a local
+  // count of 1 within a single band; without this, centerBalance would
+  // wrongly crown that band-local singleton as the hero instead of the
+  // piece that's genuinely unique on the whole table.
+  function globalUniqueKeys(items){
+    const keys = new Set();
+    groupByKey(items).forEach(g=>{ if(g.length===1) keys.add(containerKey(g[0])); });
+    return keys;
+  }
+
+  // Standing symmetry rule (kept permanently, applies to every band in all
+  // 3 dispositions): cut the table in half on the centerline and the two
+  // sides must mirror each other, like folding the table over on itself. A
+  // container kind that shows up only once, a true singleton, is always
+  // the centered hero, never pushed off to one side, even if some other
+  // group looks bigger overall. A container kind that shows up exactly
+  // twice (or any even count) is always placed as a true mirrored pair, at
+  // equal distance from center on both sides, never scattered or diagonal.
+  // Remaining groups are mirrored outward from the center in "rings": the
+  // biggest, most prominent group sits closest to center on both sides,
+  // then the next biggest further out, so the whole thing reads as one
+  // balanced reflection instead of a random mix. Reasonable exceptions are
+  // fine when strict symmetry genuinely doesn't make sense.
+  // Sorts with a random tiebreaker for anything the comparator itself
+  // scores as equal, so items with no real reason to prefer one order over
+  // another land differently across repeated calls. Each item gets ONE
+  // random value up front (rather than re-rolling on every comparison,
+  // which can behave inconsistently), so the sort stays a proper, stable
+  // sort for this one call.
+  function sortWithRandomTiebreak(arr, cmp){
+    const decorated = arr.map(it => ({it, r: Math.random()}));
+    decorated.sort((a,b)=> cmp(a.it, b.it) || (a.r - b.r));
+    return decorated.map(d=>d.it);
+  }
+
+  // Container kinds within about 15% of each other's area read as roughly
+  // the same "size tier" at a glance, so which one gets to sit in the ring
+  // closer to center is treated as a genuine tie between them, not a fixed
+  // order. This is what makes clicking "Générer" again actually change
+  // which shapes sit where on the table, not just which dessert fills an
+  // already-fixed slot.
+  const AREA_TIE_TOLERANCE = 0.15;
+
+  function centerBalance(items, uniqueKeys){
+    if(items.length===0) return {left:[], right:[], center:null, isHeroCenter:false};
+    const groups = sortWithRandomTiebreak(groupByKey(items), (a,b)=>{
+      const areaA = a[0].wIn*a[0].dIn, areaB = b[0].wIn*b[0].dIn;
+      const diff = areaB - areaA;
+      if(Math.abs(diff) <= AREA_TIE_TOLERANCE*Math.max(areaA,areaB)) return 0;
+      return diff;
+    });
+    // A container kind that's unique across the WHOLE selection always wins
+    // centering first, even over a band-local singleton that merely looks
+    // bigger here. Only when nothing here is globally unique do we fall
+    // back to "whatever singleton this band happens to have".
+    const globalSingleton = uniqueKeys ? groups.find(g=>g.length===1 && uniqueKeys.has(containerKey(g[0]))) : null;
+    const singleton = globalSingleton || groups.find(g=>g.length===1);
+    // The hero ring (the visual "this piece is genuinely one of a kind on
+    // the whole table" marker) is only earned by a TRUE global singleton.
+    // A merely-biggest-piece-in-this-band fallback still gets placed dead
+    // center for visual balance, but must never wear the ring, since it
+    // isn't actually unique and would mislead about what's special.
+    const isHeroCenter = !!globalSingleton;
+    let center, restGroups;
+    if(singleton){
+      center = singleton[0];
+      restGroups = groups.filter(g=>g!==singleton);
+    } else {
+      let centerIdx = items.reduce((best,it,idx)=> (it.wIn*it.dIn) > (items[best].wIn*items[best].dIn) ? idx : best, 0);
+      center = items[centerIdx];
+      let used = false;
+      restGroups = groups.map(g=>{
+        if(!used && g.includes(center)){
+          used = true;
+          const filtered = g.filter(it=>it!==center);
+          return filtered.length ? filtered : null;
+        }
+        return g;
+      }).filter(Boolean);
+    }
+    const leftNear = [], rightNear = [];
+    restGroups.forEach(g=>{
+      // Which specific piece within a repeated group sits closer to center
+      // vs further out doesn't affect the balance at all, so shuffle it:
+      // this is the main source of a genuinely different-looking plan
+      // between repeated clicks on the same selection, without changing
+      // who's the hero or how many end up on each side.
+      const pool = sortWithRandomTiebreak(g, ()=>0);
+      while(pool.length>=2){
+        rightNear.push(pool.shift());
+        leftNear.push(pool.shift());
+      }
+      if(pool.length===1){
+        if(leftNear.length <= rightNear.length) leftNear.push(pool[0]);
+        else rightNear.push(pool[0]);
+      }
+    });
+    const left = leftNear.slice().reverse();
+    return {left, right:rightNear, center, isHeroCenter};
+  }
+
+  function mergeBalanced(b){
+    return [...b.left, ...(b.center!=null?[b.center]:[]), ...b.right];
+  }
+
+  // A fingerprint of the SHAPE and PLACEMENT of one look's back row / front
+  // row / vegan row, left to right: which container kind (shape, size,
+  // elevated, finish) sits in which position. Deliberately ignores WHICH
+  // dessert (by name) is in a given plate, since two plans that put the
+  // same shapes in the same spots read as the same floor plan even if
+  // different desserts happen to occupy them; only a real change in shape
+  // or position counts as "a new plan" here.
+  function lookSignature(mainBands, veganB, plantCount){
+    const sig = arr => arr.map(it => it.isPlant ? 'plant' : containerKey(it)).join('|');
+    const mainSig = mainBands.map(b => sig(mergeBalanced(b))).join('>>');
+    return mainSig + '>>' + sig(mergeBalanced(veganB)) + '>>p'+plantCount;
+  }
+
+  // Plants only ever move as a single, coherent decision, never split into
+  // pieces that land in visually unrelated spots (one plant tucked beside a
+  // plate while its "partner" sits alone on the far divider reads as a
+  // mistake, not a choice). With 3 or fewer, they always stay together on
+  // the divider line, the one placement that's inherently symmetric no
+  // matter what the two rows look like. From 4 up, exactly one matched PAIR
+  // (never a lone plant) can move into whichever row actually has a true
+  // center, with a real gap on both sides of it (at least 3 real pieces),
+  // so the pair genuinely flanks that row's centerpiece; everything else
+  // still gathers on the divider as one group.
+  function distributePlants(plantCount, backLen, frontLen){
+    if(plantCount<=0) return {divider:0, back:0, front:0};
+    if(plantCount<4) return {divider:plantCount, back:0, front:0};
+    if(backLen>=3) return {divider:plantCount-2, back:2, front:0};
+    if(frontLen>=3) return {divider:plantCount-2, back:0, front:2};
+    return {divider:plantCount, back:0, front:0};
+  }
+
+  // Inserts plant pieces directly into a band's item array at the gaps
+  // closest to the center first, so with just one or two plants they land
+  // right next to the hero/center piece, and with more they spread evenly
+  // outward, always symmetric left/right since the gaps are ranked by
+  // distance from the row's true middle.
+  function interleaveBandPlants(items, plantCount){
+    if(plantCount<=0 || items.length<2) return items;
+    const gapCount = items.length-1;
+    const mid = (gapCount-1)/2;
+    const gaps = Array.from({length:gapCount}, (_,g)=>g).sort((a,b)=>Math.abs(a-mid)-Math.abs(b-mid));
+    const chosen = new Set(gaps.slice(0, Math.min(plantCount, gapCount)));
+    const out = [];
+    items.forEach((it, idx)=>{
+      out.push(it);
+      if(idx<gapCount && chosen.has(idx)) out.push(makePlant());
+    });
+    return out;
+  }
+
+  // Splits items into two groups (A = back, B = front). The back row
+  // generally reads a bit fuller than the front, roughly 5 to 3 rather
+  // than a strict even split, so A aims for about 60% of the total instead
+  // of parity, while still never drifting into something extreme like 8
+  // and 1. Moves the smallest items across first since they blend in the
+  // least noticeably, and when pulling extra pieces into the back (A),
+  // leaves fruit desserts in front as long as any non-fruit alternative
+  // exists, since fruit reads best up close.
+  function splitBalanced(preferA, preferB){
+    let A = preferA.slice();
+    let B = preferB.slice();
+    const areaOf = it => it.wIn*it.dIn;
+    const total = A.length + B.length;
+    // The back-heavier split ratio itself varies a bit between regenerates
+    // (roughly 56% to 68%, still always fuller in back than front), so the
+    // actual back/front counts can genuinely differ across clicks on the
+    // same selection, not just who's shuffled within an unchanged count.
+    const splitPct = 0.56 + Math.random()*0.12;
+    const targetA = total===0 ? 0 : Math.min(total, Math.max(Math.ceil(total/2), Math.round(total*splitPct)));
+    while(A.length < targetA && B.length){
+      B = sortWithRandomTiebreak(B, (x,y)=> (isFruit(x)?1:0)-(isFruit(y)?1:0) || areaOf(x)-areaOf(y));
+      A.push(B.shift());
+    }
+    while(A.length - targetA > 2 && A.length>0){
+      A = sortWithRandomTiebreak(A, (x,y)=>areaOf(x)-areaOf(y));
+      B.push(A.shift());
+    }
+    return {A, B};
+  }
+
+  function makePlant(){
+    return {name:'', wIn:PLANT_SIZE_IN, dIn:PLANT_SIZE_IN, shapeKind:'round', vegan:false, isPlant:true};
+  }
+
+  // A fresh-fruit dessert reads best up front, easy to reach and see, even
+  // when it's plated on something big (like a fruit platter) that would
+  // otherwise pull it toward the back with the other large pieces.
+  function isFruit(item){
+    return /fruit/i.test(item.name || '');
+  }
+
+  function pieceEl(item, size, isHero, isUtil){
+    if(item.isPlant){
+      return `<div class="shape greenery" style="width:${size.w}px; height:${size.h}px;"></div>`;
+    }
+    const standColorClass = item.elevated ? (item.color==='brown' ? 'stand-brown' : 'stand-white') : '';
+    const shapeClasses = ['shape', item.shapeKind, item.elevated?'stand':'', standColorClass, item.vegan?'vegan':'', isUtil?'util':'', isHero?'hero':''].filter(Boolean).join(' ');
+    const baseDim = item.shapeKind==='rect' ? `${item.wIn}"×${item.dIn}"` : `${item.wIn}"${item.shapeKind==='round'?'D':''}`;
+    const dimText = baseDim + (item.elevated ? ' · sur pied' : '');
+    const idxAttr = item.dessertIndex!=null ? ` data-dessert-idx="${item.dessertIndex}"` : '';
+    return `<div class="${shapeClasses}" style="width:${size.w}px; height:${size.h}px;"${idxAttr}>
+      <div class="p-label">${item.name}</div>
+      <div class="p-dim">${dimText}${item.qty?(' · '+item.qty+' pc'):''}</div>
+    </div>`;
+  }
+
+  // One band, always a single native flex row that the browser itself wraps
+  // onto extra lines the moment it runs out of room. No hand-rolled wrap
+  // math, so the wrap point always matches the real, measured space. Gap
+  // shrinks toward GAP_MIN first when the row is crowded ("rapprocher");
+  // sizes are never touched. When there's plenty of room instead (few
+  // items on a wide table), the row spreads out to use most of that extra
+  // space, instead of everything huddling in the center with empty space
+  // left on both sides, but only most of it (75%): it still stays short of
+  // the table's actual edges, so the whole thing reads as generously
+  // spaced and centered rather than stretched all the way out.
+  function computeGap(items, availW, scale){
+    if(items.length<=1) return GAP_MAX;
+    const sumW = items.reduce((s,it)=>s+Math.round(it.wIn*scale),0);
+    const usableSpace = Math.max(0, availW - sumW) * 0.75;
+    const idealGap = usableSpace / (items.length-1);
+    return Math.max(GAP_MIN, idealGap);
+  }
+
+  function bandRowEl(items, availW, scale, centerItem){
+    if(items.length===0) return null;
+    const gap = computeGap(items, availW, scale);
+    const div = document.createElement('div');
+    div.className = 'row';
+    div.style.width = availW+'px';
+    div.style.gap = `${ROW_GAP}px ${gap}px`;
+    div.innerHTML = items.map(it => pieceEl(it, {w:Math.round(it.wIn*scale), h:Math.round(it.dIn*scale)}, it===centerItem, false)).join('');
+    return div;
+  }
+
+  function utilPieces(scale){
+    const pieces = {left:[], right:[]};
+    const plateOn = document.getElementById('plateOn').checked;
+    const forkOn = document.getElementById('forkOn').checked;
+    if(plateOn){
+      const size = parseFloat(document.getElementById('plateSize').value);
+      const pos = document.getElementById('platePos').value;
+      const w = Math.round(size*scale), h = Math.round(size*scale);
+      pieces[pos].push(pieceEl({name:'Assiettes invités', wIn:size, dIn:size, shapeKind:'round', vegan:false, qty:null}, {w,h}, false, true));
+    }
+    if(forkOn){
+      const pos = document.getElementById('forkPos').value;
+      const w = Math.round(8*scale), h = Math.round(3.5*scale);
+      pieces[pos].push(pieceEl({name:'Fourchettes', wIn:8, dIn:3.5, shapeKind:'rect', vegan:false, qty:null}, {w,h}, false, true));
+    }
+    return pieces;
+  }
+
+  // The util row (guest plates / forks) is always its own row at the very
+  // bottom of the table, pinned to the extreme left or right, never mixed
+  // into the dessert rows and never at the top.
+  function utilRowEl(util){
+    if(util.left.length===0 && util.right.length===0) return null;
+    const div = document.createElement('div');
+    div.className = 'row';
+    if(util.left.length){
+      const left = document.createElement('span');
+      left.className = 'side-left';
+      left.innerHTML = util.left.join('');
+      div.appendChild(left);
+    }
+    if(util.right.length){
+      const right = document.createElement('span');
+      right.className = 'side-right';
+      right.innerHTML = util.right.join('');
+      div.appendChild(right);
+    }
+    return div;
+  }
+
+  function createTableAreaShell(widthIn, depthIn, scale){
+    const wpx = Math.round(widthIn*scale);
+    const dpx = Math.round(depthIn*scale);
+    const colorClass = document.getElementById('tableColor').value;
+    const div = document.createElement('div');
+    div.className = 'table-area' + (colorClass==='default' ? '' : ' '+colorClass);
+    div.style.width = wpx+'px';
+    div.style.height = Math.max(dpx,150)+'px';
+    const dimTop = document.createElement('span');
+    dimTop.className = 'dim-label dim-top';
+    dimTop.textContent = `${widthIn}" (${(widthIn/12).toFixed(1)} pi)`;
+    const dimSide = document.createElement('span');
+    dimSide.className = 'dim-label dim-side';
+    dimSide.textContent = `${depthIn}"`;
+    div.appendChild(dimTop);
+    div.appendChild(dimSide);
+    return div;
+  }
+
+  // Turns every piece and divider line inside a finished table plan into a
+  // free-floating, absolutely-positioned element planted at the EXACT pixel
+  // spot the flex/wrap layout just computed for it (so nothing visibly
+  // moves), then makes each piece individually draggable. This is what lets
+  // the person fine-tune a generated plan by hand afterward (drag a plate a
+  // bit, swap two spots) without breaking the real-world scale it was drawn
+  // at. Anything that isn't a piece/divider (only the corner dimension
+  // labels) is left exactly as-is.
+  function freezeToAbsolute(areaEl){
+    const areaRect = areaEl.getBoundingClientRect();
+    const toFreeze = Array.from(areaEl.querySelectorAll('.shape, .divider, .table-note'));
+    const snapshot = toFreeze.map(el=>{
+      const r = el.getBoundingClientRect();
+      return {el, left:r.left-areaRect.left, top:r.top-areaRect.top, w:r.width, h:r.height};
+    });
+    const keep = Array.from(areaEl.querySelectorAll(':scope > .dim-label'));
+    areaEl.innerHTML = '';
+    keep.forEach(k=>areaEl.appendChild(k));
+    snapshot.forEach(s=>{
+      s.el.style.position = 'absolute';
+      s.el.style.left = Math.round(s.left)+'px';
+      s.el.style.top = Math.round(s.top)+'px';
+      s.el.style.margin = '0';
+      if(s.el.classList.contains('divider')){
+        s.el.style.width = Math.round(s.w)+'px';
+      }
+      areaEl.appendChild(s.el);
+      if(s.el.classList.contains('shape')){
+        makeDraggable(s.el, areaEl);
+        setupPieceInteractions(s.el);
+      }
+    });
+  }
+
+  // Simple mouse/touch drag: press a piece, move it, let go. Position is
+  // clamped so a piece can be pulled almost anywhere but never dragged
+  // fully out of the visible table box, and the currently-dragged piece is
+  // always brought to the front so it never gets hidden under another one.
+  function makeDraggable(el, areaEl){
+    el.classList.add('draggable');
+    let startX, startY, origLeft, origTop, dragging = false;
+    function clientPoint(e){ return e.touches && e.touches[0] ? e.touches[0] : e; }
+    function onDown(e){
+      // Only the primary mouse button starts a drag: a right-click needs to
+      // reach the contextmenu handler below untouched (to offer deleting
+      // the piece), and a click that started inside the rename input (or
+      // the piece menu) must never be hijacked into a drag either.
+      if(e.type==='mousedown' && e.button!==0) return;
+      if(e.target && e.target.closest && e.target.closest('.p-label-edit, .piece-menu')) return;
+      dragging = true;
+      el.classList.add('dragging');
+      const p = clientPoint(e);
+      startX = p.clientX; startY = p.clientY;
+      origLeft = parseFloat(el.style.left)||0;
+      origTop = parseFloat(el.style.top)||0;
+      e.preventDefault();
+    }
+    function onMove(e){
+      if(!dragging) return;
+      const p = clientPoint(e);
+      const dx = p.clientX - startX, dy = p.clientY - startY;
+      const maxLeft = Math.max(0, areaEl.clientWidth - el.offsetWidth);
+      const maxTop = Math.max(0, areaEl.clientHeight - el.offsetHeight);
+      el.style.left = Math.min(maxLeft, Math.max(0, origLeft+dx))+'px';
+      el.style.top = Math.min(maxTop, Math.max(0, origTop+dy))+'px';
+      e.preventDefault();
+    }
+    function onUp(){
+      dragging = false;
+      el.classList.remove('dragging');
+    }
+    el.addEventListener('mousedown', onDown);
+    el.addEventListener('touchstart', onDown, {passive:false});
+    document.addEventListener('mousemove', onMove, {passive:false});
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchend', onUp);
+  }
+
+  // ===== Editing a plan directly: right-click to remove a piece, ==========
+  // ===== double-click a dessert's name to rename it in place. =============
+  //
+  // Wires both interactions onto one freshly-frozen piece. Renaming only
+  // applies to pieces tied to a real dessert (data-dessert-idx set by
+  // pieceEl from item.dessertIndex); plants and the guest-plate/fork
+  // utility pieces have no dessert identity to rename, but can still be
+  // removed like any other piece.
+  function setupPieceInteractions(el){
+    el.addEventListener('contextmenu', e=>{
+      e.preventDefault();
+      showPieceMenu(e.clientX, e.clientY, el);
+    });
+    if(el.dataset.dessertIdx===undefined) return;
+    // Delegated on the stable .shape element itself (never replaced),
+    // rather than bound to the .p-label div directly, since that div gets
+    // swapped for an <input> and back again every time this same piece is
+    // renamed, which would otherwise silently drop the listener after the
+    // very first rename.
+    el.addEventListener('dblclick', e=>{
+      if(!e.target.closest('.p-label')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      startPlanLabelEdit(el);
+    });
+  }
+
+  // Swaps a piece's plain name label for a small text input, sized to
+  // match, so it can be renamed without leaving the plan. Enter or clicking
+  // away saves; Escape cancels. Saving goes through renameDessertFromPlan
+  // so the form field, every other occurrence of the same dessert (across
+  // all 3 dispositions), and the summary table all update together.
+  function startPlanLabelEdit(shapeEl){
+    const idx = shapeEl.dataset.dessertIdx;
+    if(idx===undefined || !DESSERT_NAMES[idx]) return;
+    if(shapeEl.querySelector('.p-label-edit')) return; // already editing
+    const labelEl = shapeEl.querySelector('.p-label');
+    if(!labelEl) return;
+    const original = DESSERT_NAMES[idx].name;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'p-label-edit';
+    input.value = original;
+    labelEl.replaceWith(input);
+    input.focus();
+    input.select();
+
+    let settled = false;
+    function finish(finalName){
+      if(!input.isConnected) return;
+      const fresh = document.createElement('div');
+      fresh.className = 'p-label';
+      fresh.textContent = finalName;
+      input.replaceWith(fresh);
+    }
+    function commit(){
+      if(settled) return;
+      settled = true;
+      const value = input.value.trim() ? input.value : original;
+      renameDessertFromPlan(idx, value);
+      finish(DESSERT_NAMES[idx] ? DESSERT_NAMES[idx].name : value);
+    }
+    function cancelEdit(){
+      if(settled) return;
+      settled = true;
+      finish(original);
+    }
+    input.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); commit(); }
+      else if(e.key==='Escape'){ e.preventDefault(); cancelEdit(); }
+    });
+    input.addEventListener('blur', commit);
+    input.addEventListener('mousedown', e=>e.stopPropagation());
+    input.addEventListener('click', e=>e.stopPropagation());
+    input.addEventListener('dblclick', e=>e.stopPropagation());
+  }
+
+  // A single shared right-click menu, reused and repositioned for whichever
+  // piece was just right-clicked, with one action: remove that piece from
+  // this generated plan. This never touches DESSERT_NAMES or the selection
+  // in section 3, only this one already-drawn plan, since it's meant as "I
+  // don't want a piece sitting HERE", not "remove this dessert everywhere".
+  let pieceMenuEl = null;
+  function ensurePieceMenu(){
+    if(pieceMenuEl) return pieceMenuEl;
+    pieceMenuEl = document.createElement('div');
+    pieceMenuEl.className = 'piece-menu';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Supprimer cette pièce';
+    pieceMenuEl.appendChild(btn);
+    pieceMenuEl._btn = btn;
+    document.body.appendChild(pieceMenuEl);
+    document.addEventListener('mousedown', e=>{
+      if(pieceMenuEl.style.display==='block' && !pieceMenuEl.contains(e.target)) hidePieceMenu();
+    });
+    document.addEventListener('scroll', hidePieceMenu, true);
+    window.addEventListener('resize', hidePieceMenu);
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') hidePieceMenu(); });
+    return pieceMenuEl;
+  }
+  function hidePieceMenu(){
+    if(pieceMenuEl) pieceMenuEl.style.display = 'none';
+  }
+  function showPieceMenu(x, y, targetEl){
+    const menu = ensurePieceMenu();
+    menu.style.display = 'block';
+    // Keep the menu fully on-screen even when the right-click happened
+    // close to a viewport edge.
+    const left = Math.min(x, window.innerWidth - 200);
+    const top = Math.min(y, window.innerHeight - 60);
+    menu.style.left = Math.max(8,left)+'px';
+    menu.style.top = Math.max(8,top)+'px';
+    menu._btn.onclick = ()=>{
+      hidePieceMenu();
+      const parent = targetEl.parentNode;
+      const nextSibling = targetEl.nextSibling;
+      targetEl.remove();
+      showUndoToast('Pièce retirée du plan.', ()=>{
+        if(!parent) return;
+        if(nextSibling && nextSibling.parentNode===parent) parent.insertBefore(targetEl, nextSibling);
+        else parent.appendChild(targetEl);
+      });
+    };
+  }
+
+  // Brief snackbar with an "Annuler" (undo) action after removing a piece,
+  // so a right-click that goes further than intended is never permanent.
+  let currentUndoToast = null, currentUndoTimer = null;
+  function removeUndoToast(){
+    if(currentUndoTimer) clearTimeout(currentUndoTimer);
+    if(currentUndoToast && currentUndoToast.parentNode) currentUndoToast.remove();
+    currentUndoToast = null;
+  }
+  function showUndoToast(message, onUndo){
+    removeUndoToast();
+    const toast = document.createElement('div');
+    toast.className = 'undo-toast';
+    const span = document.createElement('span');
+    span.textContent = message;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Annuler';
+    btn.onclick = ()=>{ onUndo(); removeUndoToast(); };
+    toast.appendChild(span);
+    toast.appendChild(btn);
+    document.body.appendChild(toast);
+    currentUndoToast = toast;
+    currentUndoTimer = setTimeout(removeUndoToast, 5000);
+  }
+
+  function gapWithDividerEl(px){
+    const div = document.createElement('div');
+    div.style.height = px+'px';
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    const line = document.createElement('div');
+    line.className = 'divider';
+    line.style.width = '100%';
+    div.appendChild(line);
+    return div;
+  }
+
+  // Decorative plants live in their own band, right on the dividing line
+  // between the back and front rows, never inside a dessert row itself.
+  // That way they never compete with plates for row width (fitting the
+  // real desserts always comes first), and being a single centered flex
+  // row here makes them trivially mirror-symmetric with no left/right
+  // bookkeeping needed. The band grows taller than the plain divider gap
+  // only if the plants themselves need more room at true scale.
+  function plantDividerEl(plantCount, availW, scale){
+    const size = Math.round(PLANT_SIZE_IN*scale);
+    const div = document.createElement('div');
+    div.style.position = 'relative';
+    div.style.minHeight = Math.max(BAND_GAP, plantCount>0 ? size : 0)+'px';
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    const line = document.createElement('div');
+    line.className = 'divider';
+    line.style.width = '100%';
+    div.appendChild(line);
+    if(plantCount>0){
+      const row = document.createElement('div');
+      row.style.position = 'absolute';
+      row.style.left = '0'; row.style.top = '50%';
+      row.style.width = availW+'px';
+      row.style.transform = 'translateY(-50%)';
+      row.style.display = 'flex';
+      // Plants get the full table width to play with instead of huddling
+      // in the middle: space-evenly spreads them (and the margins on
+      // either end) across the whole row, so more plants visibly fan out
+      // wider rather than just packing tighter. A single plant still lands
+      // dead center since space-evenly gives it one centered gap on each
+      // side. Naturally stays left-right symmetric either way.
+      row.style.justifyContent = plantCount===1 ? 'center' : 'space-evenly';
+      row.style.alignItems = 'center';
+      row.innerHTML = Array.from({length:plantCount}, () => pieceEl(makePlant(), {w:size, h:size})).join('');
+      div.appendChild(row);
+    }
+    return div;
+  }
+  function gapPlainEl(px){
+    const div = document.createElement('div');
+    div.style.height = px+'px';
+    return div;
+  }
+  function placeholderEl(text){
+    const div = document.createElement('div');
+    div.innerHTML = `<span class="table-note">${text}</span>`;
+    return div;
+  }
+
+  function buildGrouped(items, availW, scale, util, plantCount){
+    const vegan = items.filter(i=>i.vegan);
+    const nonVegan = items.filter(i=>!i.vegan);
+    const elevatedPref = nonVegan.filter(i=>i.elevated);
+    const flatPref = nonVegan.filter(i=>!i.elevated);
+    const {A:back, B:front} = splitBalanced(elevatedPref, flatPref);
+    const mainUniqueKeys = globalUniqueKeys(elevatedPref.concat(flatPref));
+    const veganUniqueKeys = globalUniqueKeys(vegan);
+
+    const backB = centerBalance(back, mainUniqueKeys);
+    const frontB = centerBalance(front, mainUniqueKeys);
+    const veganB = centerBalance(vegan, veganUniqueKeys);
+
+    const backRow = mergeBalanced(backB);
+    const frontRow = mergeBalanced(frontB);
+    const plantSplit = distributePlants(plantCount, backRow.length, frontRow.length);
+    const backRowWithPlants = interleaveBandPlants(backRow, plantSplit.back);
+    const frontRowWithPlants = interleaveBandPlants(frontRow, plantSplit.front);
+
+    const contentEl = document.createElement('div');
+    // The table's real depth splits exactly in half regardless of the
+    // table's size (18" for a 36" table, 19.5" for a 39" table, etc.), so
+    // the dessert content always centers vertically on that true physical
+    // midline, adapting to whatever depth the current table has, instead
+    // of clustering near the top and leaving empty space below.
+    contentEl.style.flex = '1';
+    contentEl.style.display = 'flex';
+    contentEl.style.flexDirection = 'column';
+    contentEl.style.justifyContent = 'center';
+    contentEl.appendChild(back.length ? bandRowEl(backRowWithPlants, availW, scale, backB.isHeroCenter ? backB.center : null) : placeholderEl('(aucun contenant élevé choisi)'));
+    contentEl.appendChild(plantDividerEl(plantSplit.divider, availW, scale));
+    contentEl.appendChild(front.length ? bandRowEl(frontRowWithPlants, availW, scale, frontB.isHeroCenter ? frontB.center : null) : placeholderEl('(aucun)'));
+    if(vegan.length){
+      contentEl.appendChild(gapPlainEl(Math.round(BAND_GAP*0.6)));
+      contentEl.appendChild(bandRowEl(mergeBalanced(veganB), availW, scale, veganB.isHeroCenter ? veganB.center : null));
+    }
+    return {contentEl, utilEl: utilRowEl(util), signature: lookSignature([backB, frontB], veganB, plantCount)};
+  }
+
+  // Second always-2-rows variant: instead of splitting by elevated/flat
+  // (Classique) or alternating index (Quinconce), this splits by TRUE SIZE:
+  // the bigger, more imposing pieces anchor the back row, the smaller ones
+  // sit up front, still balanced within 2 and still mirror-symmetric within
+  // each row via centerBalance. With a big enough spread (9+ pieces once
+  // vegan items are set aside), a real table often naturally reads better
+  // as 3 shallow rows instead of 2 deep ones, so this variant sometimes
+  // (not always, real tables aren't identical every time) splits into
+  // back/middle/front tiers by the same true-size ranking instead.
+  function buildBySize(items, availW, scale, util, plantCount){
+    const vegan = items.filter(i=>i.vegan);
+    const main = items.filter(i=>!i.vegan);
+    const areaOf = it => it.wIn*it.dIn;
+    // Cake stands rank as "back" material first (for that raised, elevated
+    // look at the back of the table); fruit desserts rank as "front"
+    // material even if their plate is big, since fruit reads best up
+    // close; everything else falls in by true size, biggest first.
+    const sorted = sortWithRandomTiebreak(main, (a,b)=>{
+      if(a.elevated !== b.elevated) return a.elevated ? -1 : 1;
+      const fa = isFruit(a), fb = isFruit(b);
+      if(fa !== fb) return fa ? 1 : -1;
+      return areaOf(b)-areaOf(a);
+    });
+    const mainUniqueKeys = globalUniqueKeys(main);
+    const veganUniqueKeys = globalUniqueKeys(vegan);
+    const veganB = centerBalance(vegan, veganUniqueKeys);
+
+    const contentEl = document.createElement('div');
+    contentEl.style.flex = '1';
+    contentEl.style.display = 'flex';
+    contentEl.style.flexDirection = 'column';
+    contentEl.style.justifyContent = 'center';
+
+    const useThreeRows = sorted.length >= 9 && Math.random() < 0.5;
+    let mainBands;
+    if(useThreeRows){
+      const backTarget = Math.round(sorted.length*0.42);
+      const midTarget = Math.round(sorted.length*0.32);
+      const back = sorted.slice(0, backTarget);
+      const middle = sorted.slice(backTarget, backTarget+midTarget);
+      const front = sorted.slice(backTarget+midTarget);
+      const backB = centerBalance(back, mainUniqueKeys);
+      const midB = centerBalance(middle, mainUniqueKeys);
+      const frontB = centerBalance(front, mainUniqueKeys);
+      mainBands = [backB, midB, frontB];
+      const rowLabels = ['(aucun)', '(aucun)', '(aucun)'];
+      const rows = [back, middle, front];
+      // On a real table, 3 rows never line up as 3 perfectly straight,
+      // perfectly aligned lines: the middle one naturally reads staggered
+      // against the other two rather than stacked directly on top of them.
+      // Nudging just the middle row sideways breaks that rigid grid look
+      // without touching the mirror symmetry of any one row on its own.
+      const staggerPx = Math.round(availW * 0.07) * (Math.random()<0.5 ? -1 : 1);
+      mainBands.forEach((b, idx) => {
+        const rowEl = rows[idx].length ? bandRowEl(mergeBalanced(b), availW, scale, b.isHeroCenter ? b.center : null) : placeholderEl(rowLabels[idx]);
+        if(idx===1 && rows[idx].length){
+          rowEl.style.transform = `translateX(${staggerPx}px)`;
+        }
+        contentEl.appendChild(rowEl);
+        if(idx < mainBands.length-1){
+          const share = Math.floor(plantCount/2) + (idx===0 ? plantCount%2 : 0);
+          contentEl.appendChild(plantDividerEl(share, availW, scale));
+        }
+      });
+    } else {
+      const half = Math.ceil(sorted.length/2);
+      const largePref = sorted.slice(0, half);
+      const smallPref = sorted.slice(half);
+      const {A:back, B:front} = splitBalanced(largePref, smallPref);
+      const backB = centerBalance(back, mainUniqueKeys);
+      const frontB = centerBalance(front, mainUniqueKeys);
+      mainBands = [backB, frontB];
+
+      const backRow = mergeBalanced(backB);
+      const frontRow = mergeBalanced(frontB);
+      const plantSplit = distributePlants(plantCount, backRow.length, frontRow.length);
+      const backRowWithPlants = interleaveBandPlants(backRow, plantSplit.back);
+      const frontRowWithPlants = interleaveBandPlants(frontRow, plantSplit.front);
+      contentEl.appendChild(back.length ? bandRowEl(backRowWithPlants, availW, scale, backB.isHeroCenter ? backB.center : null) : placeholderEl('(aucun)'));
+      contentEl.appendChild(plantDividerEl(plantSplit.divider, availW, scale));
+      contentEl.appendChild(front.length ? bandRowEl(frontRowWithPlants, availW, scale, frontB.isHeroCenter ? frontB.center : null) : placeholderEl('(aucun)'));
+    }
+    if(vegan.length){
+      contentEl.appendChild(gapPlainEl(Math.round(BAND_GAP*0.6)));
+      contentEl.appendChild(bandRowEl(mergeBalanced(veganB), availW, scale, veganB.isHeroCenter ? veganB.center : null));
+    }
+    return {contentEl, utilEl: utilRowEl(util), signature: lookSignature(mainBands, veganB, plantCount)};
+  }
+
+  function buildAlterne(items, availW, scale, util, plantCount){
+    // Cake stands are nudged toward the start of the alternating order and
+    // fruit desserts toward the end (stable otherwise, so relative order
+    // matches the selection), so the even indices (which become the back
+    // row) pick up more stands for that raised look, and the odd indices
+    // (the front row) pick up more fruit, while still keeping the zigzag
+    // character that makes this look distinct from the other two.
+    const vegan = items.filter(i=>i.vegan);
+    const mainAll = items.filter(i=>!i.vegan);
+    const main = sortWithRandomTiebreak(mainAll, (a,b)=>{
+      const ea = a.elevated?1:0, eb = b.elevated?1:0;
+      if(ea !== eb) return eb - ea;
+      const fa = isFruit(a)?1:0, fb = isFruit(b)?1:0;
+      return fa - fb;
+    });
+    const back = main.filter((_,idx)=>idx%2===0);
+    const front = main.filter((_,idx)=>idx%2===1);
+    const mainUniqueKeys = globalUniqueKeys(main);
+    const veganUniqueKeys = globalUniqueKeys(vegan);
+    const backB = centerBalance(back, mainUniqueKeys);
+    const frontB = centerBalance(front, mainUniqueKeys);
+    const veganB = centerBalance(vegan, veganUniqueKeys);
+
+    const backRow = mergeBalanced(backB);
+    const frontRow = mergeBalanced(frontB);
+    const plantSplit = distributePlants(plantCount, backRow.length, frontRow.length);
+    const backRowWithPlants = interleaveBandPlants(backRow, plantSplit.back);
+    const frontRowWithPlants = interleaveBandPlants(frontRow, plantSplit.front);
+
+    const contentEl = document.createElement('div');
+    // The table's real depth splits exactly in half regardless of the
+    // table's size (18" for a 36" table, 19.5" for a 39" table, etc.), so
+    // the dessert content always centers vertically on that true physical
+    // midline, adapting to whatever depth the current table has, instead
+    // of clustering near the top and leaving empty space below.
+    contentEl.style.flex = '1';
+    contentEl.style.display = 'flex';
+    contentEl.style.flexDirection = 'column';
+    contentEl.style.justifyContent = 'center';
+    contentEl.appendChild(back.length ? bandRowEl(backRowWithPlants, availW, scale, backB.isHeroCenter ? backB.center : null) : placeholderEl('(aucun)'));
+    contentEl.appendChild(plantDividerEl(plantSplit.divider, availW, scale));
+    contentEl.appendChild(front.length ? bandRowEl(frontRowWithPlants, availW, scale, frontB.isHeroCenter ? frontB.center : null) : placeholderEl('(aucun)'));
+    if(vegan.length){
+      contentEl.appendChild(gapPlainEl(Math.round(BAND_GAP*0.6)));
+      contentEl.appendChild(bandRowEl(mergeBalanced(veganB), availW, scale, veganB.isHeroCenter ? veganB.center : null));
+    }
+    return {contentEl, utilEl: utilRowEl(util), signature: lookSignature([backB, frontB], veganB, plantCount)};
+  }
+
+  function generate(){
+    // Re-sync every dessert's container against whatever vaisselle types are
+    // currently enabled right before reading the selection, so a square
+    // plate (or any type) can never get stuck showing the wrong container
+    // no matter what order things were checked in.
+    renderDessertList(true);
+
+    const widthIn = parseFloat(document.getElementById('tableW').value) || 96;
+    const depthIn = parseFloat(document.getElementById('tableD').value) || 36;
+    const items = getSelected();
+    const results = document.getElementById('results');
+    const warn = document.getElementById('warn');
+    warn.textContent = '';
+
+    if(enabledTypes().length===0){
+      warn.textContent = 'Coche au moins un type de vaisselle en section 2.';
+      results.innerHTML = '';
+      document.getElementById('summary').innerHTML = '';
+      return;
+    }
+    if(items.length===0){
+      results.innerHTML = '<p class="note">Coche au moins un dessert en section 3.</p>';
+      document.getElementById('summary').innerHTML = '';
+      return;
+    }
+
+    const scale = scaleFor(widthIn);
+    const plantCount = Math.max(0, parseInt(document.getElementById('plantCount').value) || 0);
+
+    const looks = [
+      {name:'Classique', desc:"Deux rangées équilibrées et symétriques: contenants élevés au fond, à plat à l'avant, toujours proche d'un partage égal (par exemple 5 et 5, jamais 8 et 1).", build: buildGrouped},
+      {name:'Par taille', desc:"Deux rangées équilibrées et symétriques: les pièces plus imposantes au fond, les plus petites à l'avant, toujours proche d'un partage égal.", build: buildBySize},
+      {name:'Quinconce', desc:'Alterne fond et avant en zigzag, deux rangées toujours équilibrées en nombre et symétriques.', build: buildAlterne},
+    ];
+
+    // Pass 1: lay out empty table shells so we can measure their REAL,
+    // browser-computed content width/height (accounts for padding, border,
+    // everything) instead of guessing it in JS.
+    results.innerHTML = looks.map(l => `
+      <div class="look-card" data-look="${l.name}">
+        <div class="look-head"><h3>${l.name}</h3></div>
+        <div class="look-desc">${l.desc} <span class="drag-hint">Fais glisser n'importe quelle pièce pour l'ajuster à la main, double-clique un nom de dessert pour le renommer, ou clic droit sur une pièce pour la retirer du plan.</span></div>
+        <div class="table-area-slot"></div>
+        <button type="button" class="export-img-btn" onclick="exportLookImage(this)">Télécharger l'image</button>
+      </div>
+    `).join('');
+
+    const util = utilPieces(scale);
+    const overflowInfo = [];
+    const placementItems = expandForPlacement(items);
+
+    // A different table, different items, or a different plant count means
+    // a genuinely different pool of possible plans, so the "already shown"
+    // history only applies as long as the selection itself hasn't changed.
+    const selKey = selectionKey(widthIn, depthIn, items, plantCount);
+    if(selKey !== lastSelectionKey){
+      seenLookSignatures = {};
+      lastSelectionKey = selKey;
+    }
+
+    looks.forEach(l => {
+      const card = results.querySelector(`.look-card[data-look="${CSS.escape(l.name)}"]`);
+      const slot = card.querySelector('.table-area-slot');
+      const areaEl = createTableAreaShell(widthIn, depthIn, scale);
+      slot.appendChild(areaEl);
+      // Real, measured space inside the table box, for the rows to actually
+      // fill. clientWidth excludes the border but, contrary to what its name
+      // suggests, still INCLUDES the table's own 10px padding on each side
+      // as part of that measurement; the padding itself isn't available for
+      // a child to occupy, so it has to be subtracted here too, or a row
+      // set to this width ends up genuinely wider than the space it has,
+      // silently overflowing into the padding, unevenly, on one side.
+      const areaPad = getComputedStyle(areaEl);
+      const availW = areaEl.clientWidth - (parseFloat(areaPad.paddingLeft)||0) - (parseFloat(areaPad.paddingRight)||0);
+
+      // build() has some genuine randomness in how it breaks ties (which
+      // dessert sits closer to center, which items get pulled into the
+      // back row, etc.), so re-running it can land on a fresh arrangement.
+      // Keep trying (bounded) until this look shows something it hasn't
+      // shown before this visit; once every reasonable variation for this
+      // exact selection has already been seen, just reuse one.
+      if(!seenLookSignatures[l.name]) seenLookSignatures[l.name] = new Set();
+      const seen = seenLookSignatures[l.name];
+      let built;
+      for(let attempt=0; attempt<30; attempt++){
+        built = l.build(placementItems, availW, scale, util, plantCount);
+        if(!seen.has(built.signature)) break;
+      }
+      seen.add(built.signature);
+      const {contentEl, utilEl} = built;
+      areaEl.appendChild(contentEl);
+      if(utilEl) areaEl.appendChild(utilEl);
+
+      // Pass 2: measure the REAL rendered result. scrollHeight/scrollWidth
+      // report the true, un-clipped size even though overflow is hidden, so
+      // this always reflects exactly what did or didn't fit, no guessing.
+      // Depth (height) and width are checked and reported separately,
+      // since a table can easily have plenty of WIDTH to spare (visible
+      // gaps between pieces left to right) while still being too shallow
+      // (not enough DEPTH/profondeur) for the number of rows the plan
+      // needs; those are two different problems and look very different
+      // in the screenshot, so the warning below says which one it is.
+      const overflowH = areaEl.scrollHeight > areaEl.clientHeight + 1;
+      let overflowW = false, maxRowScrollW = availW;
+      areaEl.querySelectorAll('.row').forEach(r=>{
+        maxRowScrollW = Math.max(maxRowScrollW, r.scrollWidth);
+        if(r.scrollWidth > r.clientWidth + 1) overflowW = true;
+      });
+      if(overflowH || overflowW){
+        overflowInfo.push({
+          name: l.name,
+          extraDepthIn: overflowH ? (areaEl.scrollHeight - areaEl.clientHeight)/scale : 0,
+          extraWidthIn: overflowW ? (maxRowScrollW - availW)/scale : 0,
+        });
+      }
+
+      // The algorithm's job ends here: it picked a balanced, to-scale
+      // starting point. From this moment on the plan becomes a free canvas:
+      // every piece keeps the exact spot it was just placed at, but is now
+      // its own free-floating, draggable element, so the person can nudge
+      // anything by hand (move a plate a bit, swap two spots, pull
+      // something off-grid) without losing the real-world scale.
+      freezeToAbsolute(areaEl);
+    });
+
+    if(overflowInfo.length){
+      const names = overflowInfo.map(o=>o.name).join(', ');
+      const worstDepth = Math.max(0, ...overflowInfo.map(o=>o.extraDepthIn));
+      const worstWidth = Math.max(0, ...overflowInfo.map(o=>o.extraWidthIn));
+      const parts = [];
+      if(worstDepth > 0){
+        const suggested = Math.ceil(depthIn + worstDepth);
+        parts.push(`il manque environ ${Math.ceil(worstDepth)}" de PROFONDEUR (essaie au moins ${suggested}" au lieu de ${depthIn}")`);
+      }
+      if(worstWidth > 0){
+        const suggestedW = Math.ceil(widthIn + worstWidth);
+        parts.push(`il manque environ ${Math.ceil(worstWidth)}" de LARGEUR (essaie au moins ${suggestedW}" au lieu de ${widthIn}")`);
+      }
+      warn.textContent = `À l'échelle réelle, ça ne rentre pas pour: ${names}. ${parts.join(' et ')}. Sinon, réduis le nombre de desserts ou choisis un contenant plus petit.`;
+    }
+
+    const withQty = items.filter(i=>i.qty);
+    if(withQty.length){
+      const total = withQty.reduce((s,i)=>s+i.qty,0);
+      document.getElementById('summary').innerHTML = `
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Dessert</th><th>Contenant</th><th>Quantité (assiettes/présentoirs)</th></tr></thead>
+            <tbody>${withQty.map(i=>`<tr data-dessert-idx="${i.dessertIndex}"><td>${i.name}</td><td>${i.label}</td><td class="num">${i.qty}</td></tr>`).join('')}</tbody>
+            <tfoot><tr><td colspan="2" style="font-weight:700;padding:10px 14px;">Total</td><td class="num" style="font-weight:700;">${total}</td></tr></tfoot>
+          </table>
+        </div>`;
+    } else {
+      document.getElementById('summary').innerHTML = '';
+    }
+  }
+
+  renderPresets();
+  renderVaisselleGrid();
+  renderDessertList(false);
+  initCapabilities();
+  // The page starts blank on purpose: no auto-generated preview on first
+  // load. Generating right away used the default pre-checked desserts and
+  // whatever container each got assigned, which could look like a broken
+  // result before the person has actually chosen anything. Cleaner to wait
+  // for a deliberate click on "Générer les 3 dispositions".
+</script>
